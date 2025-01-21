@@ -96,8 +96,10 @@
 
     // 緯度経度を x, y に変換
     function latLonToXY(lat, lon) {
+      console.log(lat);
       const a = ((lon - LON_MIN) / (LON_MAX - LON_MIN)) * 800;
       const b = 800 - ((lat - LAT_MIN) / (LAT_MAX - LAT_MIN)) * 800; // 上が小さい値
+      console.log(a);
       return { x:a, y:b };
     }
 
