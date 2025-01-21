@@ -60,7 +60,10 @@
     <div id="loading">読み込み中...</div>
     <div id="options" style="display: none;"></div>
     <div id="map-container" style="display: none;">
-    <img src="Japanmap.svg" id="japan-map" alt="日本地図" width="800" height="800">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
+        <img src="Japanmap.svg" id="japan-map" alt="日本地図" width="800" height="800">
+        <circle id="example-shrine" cx="400" cy="200" r="5" fill="red" style="display: none;"></circle>
+      </svg>
     </div>
     <button id="submit-button" onclick="submitAnswer()" style="display: none;">決定</button>
   </div>
@@ -150,7 +153,7 @@
       const questionText = document.getElementById('question-text');
 
       if (currentGameMode === 'guess-location') {
-        questionText.textContent = `この神社はどこにありますか？ (${currentQuestion.data['所在地']})`;
+        questionText.textContent = `この神社はどこにありますか？ (${currentQuestion.data['名称']}`+`祭神:${currentQuestion.data['祭神']}`+`創建:${currentQuestion.data['創建']}`+`旧社格:${currentQuestion.data['旧社格']}`+`建築様式:${currentQuestion.data['様式']})`;
         document.getElementById('submit-button').style.display = 'block';
 
         const map = document.getElementById('japan-map');
@@ -174,7 +177,7 @@
           map.appendChild(pin);
         });
       } else {
-        questionText.textContent = `次のうち、正しい神社の名前はどれですか？ (${currentQuestion.data['所在地']})`;
+        questionText.textContent = `次のうち、正しい神社の名前はどれですか？ (`+`祭神:${currentQuestion.data['祭神']}`+`創建:${currentQuestion.data['創建']}`+`旧社格:${currentQuestion.data['旧社格']}`+`建築様式:${currentQuestion.data['様式']})`;
         const optionsDiv = document.getElementById('options');
         optionsDiv.innerHTML = '';
         currentOptions.forEach(option => {
