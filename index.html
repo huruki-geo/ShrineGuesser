@@ -51,7 +51,7 @@
   <div class="game-mode" id="game-mode-selection">
     <h2>ゲームモードを選択してください</h2>
     <button onclick="startGame('guess-location')">神社の場所を当てる</button>
-    <button onclick="startGame('guess-name')">どれが正しい神社？</button>
+    <button onclick="startGame('guess-name')">どれがあてはまる神社？</button>
   </div>
 
   <div class="question" id="question" style="display: none;">
@@ -111,7 +111,7 @@
       return { x:a, y:b };
     }
 
-    // ゲームを開始
+    // ゲームスタ＾と
     function startGame(mode) {
       currentGameMode = mode;
       currentScore = 0;
@@ -131,7 +131,7 @@
       loadQuestion();
     }
 
-    // 問題をロード
+    // 問題ロード
     async function loadQuestion() {
       if (isLoading) return; // 既にロード中の場合は処理をスキップ
 
@@ -183,7 +183,7 @@
           map.appendChild(pin);
         });
       } else {
-        questionText.textContent = `次のうち、正しい神社の名前はどれですか？ (`+`祭神:${currentQuestion.data['祭神']}`+`創建:${currentQuestion.data['創建']}`+`旧社格:${currentQuestion.data['旧社格']}`+`建築様式:${currentQuestion.data['様式']})`;
+        questionText.textContent = `次のうち、あてはまる神社の名前はどれですか？ (`+`祭神:${currentQuestion.data['祭神']}`+`創建:${currentQuestion.data['創建']}`+`旧社格:${currentQuestion.data['旧社格']}`+`建築様式:${currentQuestion.data['様式']})`;
         const optionsDiv = document.getElementById('options');
         optionsDiv.innerHTML = '';
         currentOptions.forEach(option => {
@@ -246,14 +246,14 @@
       location.reload();
     }
 
-    // スコアを保存
+    // ランダム化する
     async function saveScore(playerName, score) {
       await fetch("https://script.google.com/macros/s/AKfycbw-wkcgQINOAJNsnNN82HOFCV9k0HoeNCPdFBCAQAoP-0aQNAHBeXAnY4VJvV39ZskX/exec", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ playerName, score }),
+        body: JSON.stringify({ name:playerName, score:score }),
       });
     }
 
