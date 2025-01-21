@@ -9,7 +9,7 @@
       font-family: Arial, sans-serif;
       margin: 20px;
     }
-    .question, .scoreboard {
+    .game-mode, .question, .scoreboard {
       margin-bottom: 20px;
     }
     button {
@@ -28,20 +28,43 @@
       padding: 8px;
       text-align: left;
     }
+    #map-container {
+      width: 100%;
+      max-width: 800px;
+      margin: auto;
+    }
+    #japan-map {
+      width: 100%;
+      height: auto;
+      border: 1px solid #ddd;
+    }
   </style>
 </head>
 <body>
   <h1>神社 Guesser</h1>
 
-  <div class="question">
-    <h2>問題</h2>
-    <p id="question-text">ここに問題が表示されます。</p>
-    <div id="options"></div>
+  <div class="game-mode" id="game-mode-selection">
+    <h2>ゲームモードを選択してください</h2>
+    <button onclick="startGame('guess-location')">神社の場所を当てる</button>
+    <button onclick="startGame('guess-name')">どれが正しい神社？</button>
   </div>
 
-  <div class="scoreboard">
+  <div class="question" id="question" style="display: none;">
+    <h2 id="game-title"></h2>
+    <p id="question-text">ここに問題が表示されます。</p>
+    <div id="options" style="display: none;"></div>
+    <div id="map-container" style="display: none;">
+      <svg id="japan-map" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
+        <!-- 日本地図のSVGパスやシェイプをここに挿入 -->
+        <circle id="example-shrine" cx="400" cy="200" r="5" fill="red" style="display: none;"></circle>
+      </svg>
+    </div>
+    <button id="submit-button" onclick="submitAnswer()" style="display: none;">決定</button>
+  </div>
+
+  <div class="scoreboard" id="scoreboard" style="display: none;">
     <h2>スコアボード</h2>
-    <table id="scoreboard">
+    <table>
       <tr>
         <th>プレイヤー名</th>
         <th>スコア</th>
@@ -53,9 +76,32 @@
 
   <script>
     const apiBaseUrl = 'https://script.google.com/macros/s/AKfycbw5cStUtPAC8pOm3ytdgtcSJWTu0E-5Ljc0bpX07yyQ7WzBYbHZSmvMuFkW0ByBf87J/exec'; // API URL を設定
+    let currentGameMode = null;
     let currentQuestion = null;
     let currentOptions = [];
     let currentScore = 0;
+    let attempts = 0;
+    let selectedPosition = null;
+
+    // ゲームを開始
+    function startGame(mode) {
+      currentGameMode = mode;
+      currentScore = 0;
+      attempts = 0;
+
+      document.getElementById('game-mode-selection').style.display = 'none';
+      document.getElementById('question').style.display = 'block';
+
+      if (mode === 'guess-location') {
+        document.getElementById('game-title').textContent = '神社の場所を当てる';
+        document.getElementById('map-container').style.display = 'block';
+      } else {
+        document.getElementById('game-title').textContent = 'どれが正しい神社？';
+        document.getElementById('options').style.display = 'block';
+      }
+
+      loadQuestion();
+    }
 
     // 問題をロード
     async function loadQuestion() {
@@ -71,32 +117,93 @@
     // 問題を表示
     function displayQuestion() {
       const questionText = document.getElementById('question-text');
-      const optionsDiv = document.getElementById('options');
 
-      questionText.textContent = `この神社はどこにありますか？ (${currentQuestion.data['所在地']})`;
+      if (currentGameMode === 'guess-location') {
+        questionText.textContent = `この神社はどこにありますか？ (${currentQuestion.data['所在地']})`;
+        document.getElementById('submit-button').style.display = 'block';
 
-      optionsDiv.innerHTML = '';
-      currentOptions.forEach(option => {
-        const button = document.createElement('button');
-        button.textContent = option;
-        button.onclick = () => checkAnswer(option);
-        optionsDiv.appendChild(button);
-      });
+        const map = document.getElementById('japan-map');
+        map.addEventListener('click', event => {
+          const rect = map.getBoundingClientRect();
+          const x = event.clientX - rect.left;
+          const y = event.clientY - rect.top;
+
+          selectedPosition = { x, y };
+
+          // 選択位置を示すピンを表示
+          const existingPin = document.getElementById('selected-pin');
+          if (existingPin) existingPin.remove();
+
+          const pin = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          pin.setAttribute('id', 'selected-pin');
+          pin.setAttribute('cx', x);
+          pin.setAttribute('cy', y);
+          pin.setAttribute('r', 5);
+          pin.setAttribute('fill', 'blue');
+          map.appendChild(pin);
+        });
+      } else {
+        questionText.textContent = `次のうち、正しい神社の名前はどれですか？ (${currentQuestion.data['所在地']})`;
+        const optionsDiv = document.getElementById('options');
+        optionsDiv.innerHTML = '';
+        currentOptions.forEach(option => {
+          const button = document.createElement('button');
+          button.textContent = option;
+          button.onclick = () => checkAnswer(option);
+          optionsDiv.appendChild(button);
+        });
+      }
+    }
+
+    // 答えを送信
+    function submitAnswer() {
+      if (!selectedPosition) {
+        alert('地図にピンを刺してください。');
+        return;
+      }
+
+      const shrinePosition = { x: 400, y: 200 }; // 例として神社の座標 (SVG内の位置に対応)
+      const dx = selectedPosition.x - shrinePosition.x;
+      const dy = selectedPosition.y - shrinePosition.y;
+      const distance = Math.sqrt(dx ** 2 + dy ** 2);
+
+      const score = Math.max(0, 100 - Math.floor(distance / 5)); // 距離に応じたスコア計算
+      currentScore += score;
+
+      alert(`得点: ${score}点`);
+
+      attempts++;
+      if (attempts < 10) {
+        loadQuestion();
+      } else {
+        endGame();
+      }
     }
 
     // 答えをチェック
     function checkAnswer(selected) {
       if (selected === currentQuestion.name) {
         alert('正解！');
-        currentScore++;
+        currentScore += 10;
       } else {
         alert(`不正解！正解は ${currentQuestion.name} です。`);
       }
 
+      attempts++;
+      if (attempts < 10) {
+        loadQuestion();
+      } else {
+        endGame();
+      }
+    }
+
+    // ゲーム終了
+    function endGame() {
       const playerName = prompt('名前を入力してください:');
       saveScore(playerName, currentScore);
 
-      loadQuestion();
+      alert(`ゲーム終了！合計スコア: ${currentScore}`);
+      location.reload();
     }
 
     // スコアを保存
@@ -110,31 +217,11 @@
       });
     }
 
-    // スコアボードを取得
-    async function fetchScores() {
-      const response = await fetch(apiBaseUrl);
-      const scores = await response.json();
-
-      const scoreboard = document.getElementById('scoreboard');
-      scoreboard.innerHTML = '<tr><th>プレイヤー名</th><th>スコア</th><th>日時</th></tr>';
-      scores.forEach(score => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${score.playerName}</td>
-          <td>${score.score}</td>
-          <td>${new Date(score.timestamp).toLocaleString()}</td>
-        `;
-        scoreboard.appendChild(row);
-      });
-    }
-
     // 配列をランダムに並び替える
     function shuffle(array) {
       return array.sort(() => Math.random() - 0.5);
     }
-
-    // 初期化
-    loadQuestion();
   </script>
 </body>
 </html>
+
