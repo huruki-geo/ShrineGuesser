@@ -5,11 +5,77 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>神社 Guesser</title>
   <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
-      crossorigin="anonymous"
-    />
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+    crossorigin="anonymous"
+  />
+  <style>
+    body {
+      background-color: #f0f8ff;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      color: #333;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: bold;
+      color: #ff4500;
+      text-shadow: 2px 2px #ffa07a;
+    }
+
+    h2 {
+      font-size: 2rem;
+      color: #1e90ff;
+      margin-bottom: 20px;
+    }
+
+    button {
+      background: linear-gradient(45deg, #ff7f50, #ff4500);
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1.2rem;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    #options button {
+      margin: 10px;
+    }
+
+    #loading {
+      font-size: 1.5rem;
+      color: #ff6347;
+    }
+
+    #map-container img {
+      border: 5px solid #1e90ff;
+      border-radius: 15px;
+      margin-top: 20px;
+    }
+
+    #scoreList {
+      list-style: none;
+      padding: 0;
+    }
+
+    #scoreList li {
+      background: #ffe4b5;
+      margin: 10px auto;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    }
+  </style>
 </head>
 <body>
   <h1>神社 Guesser</h1>
@@ -26,15 +92,15 @@
     <div id="loading">読み込み中...</div>
     <div id="options" style="display: none;"></div>
     <div id="map-container" style="display: none;">
-        <img src="Japanmap.svg" id="japan-map" alt="日本地図" width="800" height="800">
+      <img src="Japanmap.svg" id="japan-map" alt="日本地図" width="800" height="800">
     </div>
     <button id="submit-button" onclick="submitAnswer()" style="display: none;">決定</button>
   </div>
 
-   <h1>Scoreboard</h1>
+  <h1>Scoreboard</h1>
   <button id="loadScores">スコアを取得する</button>
   <ul id="scoreList"></ul>
-  </div>
+</body>
 
   <script>
     const apiBaseUrl = 'https://script.google.com/macros/s/AKfycbw5cStUtPAC8pOm3ytdgtcSJWTu0E-5Ljc0bpX07yyQ7WzBYbHZSmvMuFkW0ByBf87J/exec'; // API URL を設定
@@ -234,6 +300,5 @@
       integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
       crossorigin="anonymous"
     ></script>
-</body>
 </html>
 
