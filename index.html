@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>神社 Guesser</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .question, .scoreboard {
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+    th, td {
+      padding: 8px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <h1>神社 Guesser</h1>
+
+  <div class="question">
+    <h2>問題</h2>
+    <p id="question-text">ここに問題が表示されます。</p>
+    <div id="options"></div>
+  </div>
+
+  <div class="scoreboard">
+    <h2>スコアボード</h2>
+    <table id="scoreboard">
+      <tr>
+        <th>プレイヤー名</th>
+        <th>スコア</th>
+        <th>日時</th>
+      </tr>
+    </table>
+    <button onclick="fetchScores()">スコアボードを更新</button>
+  </div>
+
+  <script>
+    const apiBaseUrl = 'https://script.google.com/macros/s/AKfycbyzEIgD4WgfrQN3DFJFK93hLB2owz5EeGlSrsRmOtNSuqSdHDAQmSfeQrzQ2BSMUXk-/exec'; // API URL を設定
+    let currentQuestion = null;
+    let currentOptions = [];
+    let currentScore = 0;
+
+    // 問題をロード
+    async function loadQuestion() {
+      const response = await fetch(`${apiBaseUrl}?mode=random`);
+      const data = await response.json();
+
+      currentQuestion = data.correct;
+      currentOptions = shuffle([data.correct.name, ...data.wrong]);
+
+      displayQuestion();
+    }
+
+    // 問題を表示
+    function displayQuestion() {
+      const questionText = document.getElementById('question-text');
+      const optionsDiv = document.getElementById('options');
+
+      questionText.textContent = `この神社はどこにありますか？ (${currentQuestion.data['所在地']})`;
+
+      optionsDiv.innerHTML = '';
+      currentOptions.forEach(option => {
+        const button = document.createElement('button');
+        button.textContent = option;
+        button.onclick = () => checkAnswer(option);
+        optionsDiv.appendChild(button);
+      });
+    }
+
+    // 答えをチェック
+    function checkAnswer(selected) {
+      if (selected === currentQuestion.name) {
+        alert('正解！');
+        currentScore++;
+      } else {
+        alert(`不正解！正解は ${currentQuestion.name} です。`);
+      }
+
+      const playerName = prompt('名前を入力してください:');
+      saveScore(playerName, currentScore);
+
+      loadQuestion();
+    }
+
+    // スコアを保存
+    async function saveScore(playerName, score) {
+      await fetch(apiBaseUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ playerName, score }),
+      });
+    }
+
+    // スコアボードを取得
+    async function fetchScores() {
+      const response = await fetch(apiBaseUrl);
+      const scores = await response.json();
+
+      const scoreboard = document.getElementById('scoreboard');
+      scoreboard.innerHTML = '<tr><th>プレイヤー名</th><th>スコア</th><th>日時</th></tr>';
+      scores.forEach(score => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${score.playerName}</td>
+          <td>${score.score}</td>
+          <td>${new Date(score.timestamp).toLocaleString()}</td>
+        `;
+        scoreboard.appendChild(row);
+      });
+    }
+
+    // 配列をランダムに並び替える
+    function shuffle(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
+
+    // 初期化
+    loadQuestion();
+  </script>
+</body>
+</html>
