@@ -97,6 +97,8 @@
     // 緯度経度を x, y に変換
     function latLonToXY(lat, lon) {
       console.log(lat);
+      lat = parseFloat(lat.toFixed(6)); // 小数点以下6桁
+      lon = parseFloat(lon.toFixed(6));
       const a = ((lon - LON_MIN) / (LON_MAX - LON_MIN)) * 800;
       const b = 800 - ((lat - LAT_MIN) / (LAT_MAX - LAT_MIN)) * 800; // 上が小さい値
       console.log(a);
@@ -194,7 +196,7 @@
         return;
       }
       
-      const shrinePosition = latLonToXY(currentQuestion.data['東経'],currentQuestion.data['北緯']); // 例として神社の座標 (SVG内の位置に対応)
+      const shrinePosition = latLonToXY(currentQuestion.data['北緯'],currentQuestion.data['東経']); // 例として神社の座標 (SVG内の位置に対応)
       const dx = selectedPosition.x - shrinePosition.x;
       const dy = selectedPosition.y - shrinePosition.y;
       const distance = Math.sqrt(dx ** 2 + dy ** 2);
