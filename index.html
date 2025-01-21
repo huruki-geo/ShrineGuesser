@@ -250,6 +250,7 @@
     async function saveScore(playerName, score) {
       await fetch("https://script.google.com/macros/s/AKfycbyDeUZYzJdp2EN8jsVNomXih-fE4ONKxK-_YiIfhybykAz7KOQmsrggsyZVqnGsH1DG/exec", {
         method: 'POST',
+        mode: "no-cors",
         headers: {
           'Content-Type': 'application/json',
         },
