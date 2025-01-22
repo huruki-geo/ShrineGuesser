@@ -126,7 +126,7 @@ const scoreList = document.getElementById("scoreList");
       // スコアをリストに表示
       scores.forEach((score) => {
         const listItem = document.createElement("li");
-        listItem.textContent =' ${score.name}: ${score.score} (Date: ${score.date})';
+        listItem.textContent = `${score.name}: ${score.score} (Date: ${score.date}) `;
         scoreList.appendChild(listItem);
       });
     });
