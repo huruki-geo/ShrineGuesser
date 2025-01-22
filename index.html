@@ -201,12 +201,10 @@
     correctOption.onclick = () => handleAnswer(true);
 
     const wrongOptions = shuffle(
-      currentQuestions[currentIndex].wrong
-        .forEach(wron =>
+      currentQuestions[currentIndex].wrong.forEach(wron =>
       const btn = document.createElement('button');
       btn.textContent = wron;
       btn.onclick = () => handleAnswer(false);
-      return btn;
     ));
 
     const allOptions = shuffle([correctOption, ...wrongOptions]);
@@ -219,7 +217,7 @@
       currentScore += 10;
       alert('正解です！');
     } else {
-      alert(`不正解！正解は ${currentQuestions[currentIndex]['名称']} です。`);
+      alert(`不正解！正解は ${currentQuestions[currentIndex].correct.data['名称']} です。`);
     }
 
     nextQuestion();
