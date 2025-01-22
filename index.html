@@ -196,7 +196,7 @@
     const optionsDiv = document.getElementById('options');
     optionsDiv.innerHTML = '';
 
-    const currentOptions = shuffle([currentQuestions[currentIndex].correct.data['名称'], ...currentQuestions[currentIndex].wrong);
+    const currentOptions = shuffle([currentQuestions[currentIndex].correct.name, ...currentQuestions[currentIndex].wrong);
      currentOptions.forEach(option => {
           const button = document.createElement('button');
           button.textContent = option;
