@@ -115,7 +115,7 @@
   const LON_MIN = 123.0;
   const LON_MAX = 146.0;
 const scoreList = document.getElementById("scoreList");
-
+    const loadScoresButton = document.getElementById("loadScores");
     loadScoresButton.addEventListener("click", async () => {
       const response = await fetch("https://script.google.com/macros/s/AKfycbzWwnXWQ_dxaT3vkZI36DSM3Q3NlKaSTrgTEjEKjnrC-qMpmf_Uvj67Ym_JJrOI03l7/exec"); // WebアプリのURL
       const scores = await response.json();
@@ -127,6 +127,10 @@ const scoreList = document.getElementById("scoreList");
       scores.forEach((score) => {
         const listItem = document.createElement("li");
         listItem.textContent = ${score.name}: ${score.score} 
+        (Date: ${score.date});
+        scoreList.appendChild(listItem);
+      });
+    });
   // ゲームを開始
   async function startGame(mode) {
     currentGameMode = mode;
