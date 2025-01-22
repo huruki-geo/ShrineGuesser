@@ -182,7 +182,7 @@ function submitAnswer() {
   }
 
   // 現在の問題の正解座標を取得
-  const { 北緯: lat, 東経: lon } = currentQuestions[currentIndex].data;
+  const { 北緯: lat, 東経: lon } = currentQuestions[currentIndex].correct.data;
   if (!lat || !lon) {
     alert('正解データが不正です。');
     return;
