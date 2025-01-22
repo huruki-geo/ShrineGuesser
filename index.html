@@ -158,6 +158,7 @@
 
     if (currentGameMode === 'guess-location') {
       questionText.textContent = `この神社はどこにありますか？ (${question['名称']}, 祭神: ${question['祭神']}, 創建: ${question['創建']}, 旧社格: ${question['旧社格']}, 様式: ${question['様式']})`;
+      document.getElementById('submit-button').style.display = 'block';
       resetMap();
     } else {
       questionText.textContent = `次のうち、あてはまる神社の名前はどれですか？ (祭神: ${question['祭神']}, 創建: ${question['創建']}, 旧社格: ${question['旧社格']}, 様式: ${question['様式']})`;
@@ -166,10 +167,67 @@
   }
 
   // 地図をリセット
-  function resetMap() {
-    const map = document.getElementById('japan-map');
-    map.addEventListener('click', handleMapClick);
+  // 緯度経度を SVG の x, y 座標に変換
+function latLonToXY(lat, lon) {
+  const x = ((lon - LON_MIN) / (LON_MAX - LON_MIN)) * 800; // 横幅800に正規化
+  const y = 800 - ((lat - LAT_MIN) / (LAT_MAX - LAT_MIN)) * 800; // 縦幅800に正規化（逆方向）
+  return { x, y };
+}
+
+// 回答を送信
+function submitAnswer() {
+  if (!selectedPosition) {
+    alert('地図上で位置を選択してください。');
+    return;
   }
+
+  // 現在の問題の正解座標を取得
+  const { 北緯: lat, 東経: lon } = currentQuestions[currentIndex].data;
+  if (!lat || !lon) {
+    alert('正解データが不正です。');
+    return;
+  }
+
+  const shrinePosition = latLonToXY(lat, lon);
+
+  // 選択した位置との距離を計算
+  const dx = selectedPosition.x - shrinePosition.x;
+  const dy = selectedPosition.y - shrinePosition.y;
+  const distance = Math.sqrt(dx ** 2 + dy ** 2);
+
+  // スコア計算
+  const score = Math.max(0, 100 - Math.floor(distance / 5));
+  currentScore += score;
+
+  alert(`得点: ${score}点 (距離: ${distance.toFixed(2)}px)`);
+
+  // 次の問題へ
+  nextQuestion();
+}
+
+// 地図クリック時の処理
+function resetMap() {
+  const map = document.getElementById('japan-map');
+  map.addEventListener('click', event => {
+    const rect = map.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    selectedPosition = { x, y };
+
+    // ピンをリセットして再表示
+    const existingPin = document.getElementById('selected-pin');
+    if (existingPin) existingPin.remove();
+
+    const pin = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    pin.setAttribute('id', 'selected-pin');
+    pin.setAttribute('cx', x);
+    pin.setAttribute('cy', y);
+    pin.setAttribute('r', 5);
+    pin.setAttribute('fill', 'blue');
+    map.appendChild(pin);
+  });
+}
 
   // 地図クリック処理
   function handleMapClick(event) {
