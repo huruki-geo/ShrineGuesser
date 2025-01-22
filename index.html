@@ -114,7 +114,19 @@
   const LAT_MAX = 46.0;
   const LON_MIN = 123.0;
   const LON_MAX = 146.0;
+const scoreList = document.getElementById("scoreList");
 
+    loadScoresButton.addEventListener("click", async () => {
+      const response = await fetch("https://script.google.com/macros/s/AKfycbzWwnXWQ_dxaT3vkZI36DSM3Q3NlKaSTrgTEjEKjnrC-qMpmf_Uvj67Ym_JJrOI03l7/exec"); // WebアプリのURL
+      const scores = await response.json();
+
+      // スコアリストをクリア
+      scoreList.innerHTML = "";
+
+      // スコアをリストに表示
+      scores.forEach((score) => {
+        const listItem = document.createElement("li");
+        listItem.textContent = ${score.name}: ${score.score} 
   // ゲームを開始
   async function startGame(mode) {
     currentGameMode = mode;
@@ -293,25 +305,16 @@ function resetMap() {
     location.reload();
   }
 
-  // スコアを保存
   async function saveScore(playerName, score) {
-    try {
-      const response = await fetch(`https://script.google.com/macros/s/AKfycbyq1eRzCd_gfZzu4V2fGS0Jg6bvXYDsbHOWTUfX5bYeOt4xcfld_R1SSo3sfRSsBozj/exec`, {
+      await fetch("https://script.google.com/macros/s/AKfycbyq1eRzCd_gfZzu4V2fGS0Jg6bvXYDsbHOWTUfX5bYeOt4xcfld_R1SSo3sfRSsBozj/exec", {
         method: 'POST',
+        mode: "no-cors",
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: JSON.stringify({ name: playerName, score: score }),
+        body: JSON.stringify({ name : playerName, score : score }),
       });
-
-      if (!response.ok) {
-        throw new Error('スコアの保存に失敗しました。');
-      }
-    } catch (error) {
-      console.error(error);
     }
-  }
-
   // 配列をシャッフル
   function shuffle(array) {
     return array.sort(() => Math.random() - 0.5);
