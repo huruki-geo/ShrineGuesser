@@ -202,14 +202,12 @@
 
     const wrongOptions = shuffle(
       currentQuestions[currentIndex].wrong
-        .filter(q => q['名称'] !== question['名称'])
-        .slice(0, 3)
-    ).map(wrong => {
+        .forEach(wron =>
       const btn = document.createElement('button');
-      btn.textContent = wrong['名称'];
+      btn.textContent = wron;
       btn.onclick = () => handleAnswer(false);
       return btn;
-    });
+    ));
 
     const allOptions = shuffle([correctOption, ...wrongOptions]);
     allOptions.forEach(option => optionsDiv.appendChild(option));
