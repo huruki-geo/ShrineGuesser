@@ -89,7 +89,7 @@
   <div class="question" id="question" style="display: none;">
     <h2 id="game-title"></h2>
     <p id="question-text">ここに問題が表示されます。</p>
-    <div id="loading">読み込み中...</div>
+    <div id="loading" style="display: none;">読み込み中...</div>
     <div id="options" style="display: none;"></div>
     <div id="map-container" style="display: none;">
       <img src="Japanmap.svg" id="japan-map" alt="日本地図" width="800" height="800">
@@ -100,6 +100,16 @@
   <h1>Scoreboard</h1>
   <button id="loadScores">スコアを取得する</button>
   <ul id="scoreList"></ul>
+
+  <div id="result-screen" style="display: none;">
+    <h2>ゲーム終了！</h2>
+    <p>合計スコア: <span id="final-score"></span></p>
+    <form id="score-form">
+      <label for="player-name">名前を入力してください:</label>
+      <input type="text" id="player-name" name="player-name" required>
+      <button type="button" onclick="submitFinalScore()">スコアを送信</button>
+    </form>
+  </div>
 </body>
 
 <script>
@@ -114,23 +124,22 @@
   const LAT_MAX = 46.0;
   const LON_MIN = 123.0;
   const LON_MAX = 146.0;
-const scoreList = document.getElementById("scoreList");
-    const loadScoresButton = document.getElementById("loadScores");
-    loadScoresButton.addEventListener("click", async () => {
-      const response = await fetch("https://script.google.com/macros/s/AKfycbzWwnXWQ_dxaT3vkZI36DSM3Q3NlKaSTrgTEjEKjnrC-qMpmf_Uvj67Ym_JJrOI03l7/exec"); // WebアプリのURL
-      const scores = await response.json();
 
-      // スコアリストをクリア
-      scoreList.innerHTML = "";
+  const scoreList = document.getElementById("scoreList");
+  const loadScoresButton = document.getElementById("loadScores");
+  loadScoresButton.addEventListener("click", async () => {
+    const response = await fetch("https://script.google.com/macros/s/AKfycbzWwnXWQ_dxaT3vkZI36DSM3Q3NlKaSTrgTEjEKjnrC-qMpmf_Uvj67Ym_JJrOI03l7/exec");
+    const scores = await response.json();
 
-      // スコアをリストに表示
-      scores.forEach((score) => {
-        const listItem = document.createElement("li");
-        listItem.textContent = `${score.name}: ${score.score} (Date: ${score.date}) `;
-        scoreList.appendChild(listItem);
-      });
+    scoreList.innerHTML = "";
+
+    scores.forEach((score) => {
+      const listItem = document.createElement("li");
+      listItem.textContent = `${score.name}: ${score.score} (Date: ${score.date}) `;
+      scoreList.appendChild(listItem);
     });
-  // ゲームを開始
+  });
+
   async function startGame(mode) {
     currentGameMode = mode;
     currentScore = 0;
@@ -140,7 +149,7 @@ const scoreList = document.getElementById("scoreList");
     document.getElementById('loading').style.display = 'block';
 
     try {
-      await fetchQuestions(); // 10問分のデータを取得
+      await fetchQuestions();
       document.getElementById('loading').style.display = 'none';
       document.getElementById('question').style.display = 'block';
 
@@ -159,14 +168,12 @@ const scoreList = document.getElementById("scoreList");
     }
   }
 
-  // 問題を10問分取得
   async function fetchQuestions() {
-    const response = await fetch(`https://script.google.com/macros/s/AKfycbw5cStUtPAC8pOm3ytdgtcSJWTu0E-5Ljc0bpX07yyQ7WzBYbHZSmvMuFkW0ByBf87J/exec?mode=game&count=10`);
+    const response = await fetch(`${apiBaseUrl}?mode=game&count=10`);
     const data = await response.json();
     currentQuestions = data;
   }
 
-  // 現在の問題を表示
   function displayQuestion() {
     const question = currentQuestions[currentIndex].correct.data;
     const questionText = document.getElementById('question-text');
@@ -181,116 +188,84 @@ const scoreList = document.getElementById("scoreList");
     }
   }
 
-  // 地図をリセット
-  // 緯度経度を SVG の x, y 座標に変換
-function latLonToXY(lat, lon) {
-  const x = ((lon - LON_MIN) / (LON_MAX - LON_MIN)) * 800; // 横幅800に正規化
-  const y = 800 - ((lat - LAT_MIN) / (LAT_MAX - LAT_MIN)) * 800; // 縦幅800に正規化（逆方向）
-  return { x, y };
-}
+  function resetMap() {
+    const map = document.getElementById('japan-map');
+    map.addEventListener('click', event => {
+      const rect = map.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
 
-// 回答を送信
-function submitAnswer() {
-  if (!selectedPosition) {
-    alert('地図上で位置を選択してください。');
-    return;
+      selectedPosition = { x, y };
+
+      const existingPin = document.getElementById('selected-pin');
+      if (existingPin) existingPin.remove();
+
+      const pin = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      pin.setAttribute('id', 'selected-pin');
+      pin.setAttribute('cx', x);
+      pin.setAttribute('cy', y);
+      pin.setAttribute('r', 5);
+      pin.setAttribute('fill', 'blue');
+      map.appendChild(pin);
+    });
   }
 
-  // 現在の問題の正解座標を取得
-  const { 北緯: lat, 東経: lon } = currentQuestions[currentIndex].correct.data;
-  if (!lat || !lon) {
-    alert('正解データが不正です。');
-    return;
+  function submitAnswer() {
+    if (!selectedPosition) {
+      alert('地図上で位置を選択してください。');
+      return;
+    }
+
+    const { 北緯: lat, 東経: lon } = currentQuestions[currentIndex].correct.data;
+    if (!lat || !lon) {
+      alert('正解データが不正です。');
+      return;
+    }
+
+    const shrinePosition = latLonToXY(lat, lon);
+
+    const dx = selectedPosition.x - shrinePosition.x;
+    const dy = selectedPosition.y - shrinePosition.y;
+    const distance = Math.sqrt(dx ** 2 + dy ** 2);
+
+    const score = Math.max(0, 100 - Math.floor(distance / 5));
+    currentScore += score;
+
+    alert(`得点: ${score}点 (距離: ${distance.toFixed(2)}px)`);
+
+    nextQuestion();
   }
 
-  const shrinePosition = latLonToXY(lat, lon);
-
-  // 選択した位置との距離を計算
-  const dx = selectedPosition.x - shrinePosition.x;
-  const dy = selectedPosition.y - shrinePosition.y;
-  const distance = Math.sqrt(dx ** 2 + dy ** 2);
-
-  // スコア計算
-  const score = Math.max(0, 100 - Math.floor(distance / 5));
-  currentScore += score;
-
-  alert(`得点: ${score}点 (距離: ${distance.toFixed(2)}px)`);
-
-  // 次の問題へ
-  nextQuestion();
-}
-
-// 地図クリック時の処理
-function resetMap() {
-  const map = document.getElementById('japan-map');
-  map.addEventListener('click', event => {
-    const rect = map.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-
-    selectedPosition = { x, y };
-
-    // ピンをリセットして再表示
-    const existingPin = document.getElementById('selected-pin');
-    if (existingPin) existingPin.remove();
-
-    const pin = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    pin.setAttribute('id', 'selected-pin');
-    pin.setAttribute('cx', x);
-    pin.setAttribute('cy', y);
-    pin.setAttribute('r', 5);
-    pin.setAttribute('fill', 'blue');
-    map.appendChild(pin);
-  });
-}
-
-  // 地図クリック処理
-  function handleMapClick(event) {
-    const rect = event.target.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-
-    selectedPosition = { x, y };
-
-    const existingPin = document.getElementById('selected-pin');
-    if (existingPin) existingPin.remove();
-
-    const pin = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    pin.setAttribute('id', 'selected-pin');
-    pin.setAttribute('cx', x);
-    pin.setAttribute('cy', y);
-    pin.setAttribute('r', 5);
-    pin.setAttribute('fill', 'blue');
-    event.target.appendChild(pin);
+  function latLonToXY(lat, lon) {
+    const x = ((lon - LON_MIN) / (LON_MAX - LON_MIN)) * 800;
+    const y = 800 - ((lat - LAT_MIN) / (LAT_MAX - LAT_MIN)) * 800;
+    return { x, y };
   }
 
-  // 選択肢を表示
   function displayOptions(question) {
     const optionsDiv = document.getElementById('options');
     optionsDiv.innerHTML = '';
 
     const currentOptions = shuffle([currentQuestions[currentIndex].correct.name, ...currentQuestions[currentIndex].wrong]);
-     currentOptions.forEach(option => {
-          const button = document.createElement('button');
-          button.textContent = option;
-          button.onclick = () => handleAnswer(option);
-          optionsDiv.appendChild(button);
-        });
+    currentOptions.forEach(option => {
+      const button = document.createElement('button');
+      button.textContent = option;
+      button.onclick = () => handleAnswer(option);
+      optionsDiv.appendChild(button);
+    });
   }
 
-  // 回答を処理
-  function handleAnswer(isCorrect) {
-    if (isCorrect==currentQuestions[currentIndex].correct.data['名称']) {
+  function handleAnswer(selectedOption) {
+    if (selectedOption === currentQuestions[currentIndex].correct.name) {
       currentScore += 10;
       alert('正解です！');
     } else {
-      alert(`不正解！正解は ${currentQuestions[currentIndex].correct.data['名称']} です。`);
+      alert(`不正解！正解は ${currentQuestions[currentIndex].correct.name} です。`);
     }
 
     nextQuestion();
   }
 
-  // 次の問題に進む
   function nextQuestion() {
     currentIndex++;
     if (currentIndex < currentQuestions.length) {
@@ -300,29 +275,34 @@ function resetMap() {
     }
   }
 
-  // ゲーム終了
   function endGame() {
-    const playerName = prompt('名前を入力してください:');
-    saveScore(playerName, currentScore);
-    alert(`ゲーム終了！合計スコア: ${currentScore}`);
+    document.getElementById('question').style.display = 'none';
+    document.getElementById('result-screen').style.display = 'block';
+    document.getElementById('final-score').textContent = currentScore;
+  }
+
+  async function submitFinalScore() {
+    const playerName = document.getElementById('player-name').value;
+    if (!playerName) {
+      alert('名前を入力してください。');
+      return;
+    }
+
+    await fetch(`${apiBaseUrl}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: playerName, score: currentScore }),
+    });
+
+    alert('スコアが送信されました！');
     location.reload();
   }
 
-  async function saveScore(playerName, score) {
-      await fetch("https://script.google.com/macros/s/AKfycbyq1eRzCd_gfZzu4V2fGS0Jg6bvXYDsbHOWTUfX5bYeOt4xcfld_R1SSo3sfRSsBozj/exec", {
-        method: 'POST',
-        mode: "no-cors",
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: JSON.stringify({ name : playerName, score : score }),
-      });
-    }
-  // 配列をシャッフル
   function shuffle(array) {
     return array.sort(() => Math.random() - 0.5);
   }
 </script>
+
   <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
