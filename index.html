@@ -115,7 +115,7 @@
   <div class='container mt-5'>
   	<div class='row'>
     	<div class='mx-auto text-white'>
-    	　<p>このクイズはWikipediaのテキストを改変し利用しています。 ver0.12</p>
+    	　<p>このクイズはWikipediaのテキストを改変し利用しています。 ver0.15</p>
     	</div>
     </div>
   </div>
@@ -270,7 +270,7 @@
       currentScore += 10;
       alert('正解です！');
     } else {
-      alert(`不正解！正解は ${currentQuestions[currentIndex].correct.name} です。`);
+      alert(`不正解！正解は ${currentQuestions[currentIndex].correct.data["所在地"]}にある、${currentQuestions[currentIndex].correct.name} です。`);
     }
 
     nextQuestion();
