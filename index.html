@@ -288,11 +288,14 @@
       return;
     }
 
-    await fetch(`${apiBaseUrl}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: playerName, score: currentScore }),
-    });
+    await fetch(`https://script.google.com/macros/s/AKfycbyq1eRzCd_gfZzu4V2fGS0Jg6bvXYDsbHOWTUfX5bYeOt4xcfld_R1SSo3sfRSsBozj/exec`, {
+        method: 'POST',
+        mode: "no-cors",
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({ name : playerName, score : score }),
+      });
 
     alert('スコアが送信されました！');
     location.reload();
