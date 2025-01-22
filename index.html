@@ -115,7 +115,7 @@
   <div class='container mt-5'>
   	<div class='row'>
     	<div class='mx-auto text-white'>
-    	　<p>このクイズはWikipediaのテキストを改変し利用しています。 ver0.15</p>
+    	　<p>このクイズはWikipediaのテキストを改変し利用しています。 ver0.20</p>
     	</div>
     </div>
   </div>
@@ -238,7 +238,7 @@
     const dy = selectedPosition.y - shrinePosition.y;
     const distance = Math.sqrt(dx ** 2 + dy ** 2);
 
-    const score = Math.max(0, 100 - Math.floor(distance / 5));
+    const score = Math.max(0, 100 - Math.floor(distance / 2));
     currentScore += score;
 
     alert(`得点: ${score}点 (距離: ${distance.toFixed(2)}px)  所在地は${currentQuestions[currentIndex].correct.data["所在地"]}`);
