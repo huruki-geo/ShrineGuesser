@@ -202,7 +202,7 @@
 
     const wrongOptions = shuffle(
       currentQuestions[currentIndex].wrong.forEach(wron =>
-      const btn = document.createElement('button');
+      btn = document.createElement('button');
       btn.textContent = wron;
       btn.onclick = () => handleAnswer(false);
       return btn;
