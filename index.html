@@ -196,25 +196,18 @@
     const optionsDiv = document.getElementById('options');
     optionsDiv.innerHTML = '';
 
-    const correctOption = document.createElement('button');
-    correctOption.textContent = question['名称'];
-    correctOption.onclick = () => handleAnswer(true);
-
-    const wrongOptions = shuffle(
-      currentQuestions[currentIndex].wrong.forEach(wron =>
-      btn = document.createElement('button');
-      btn.textContent = wron;
-      btn.onclick = () => handleAnswer(false);
-      return btn;
-    ));
-
-    const allOptions = shuffle([correctOption, ...wrongOptions]);
-    allOptions.forEach(option => optionsDiv.appendChild(option));
+    const currentOptions = shuffle([currentQuestions[currentIndex].correct.data['名称'], ...currentQuestions[currentIndex].wrong);
+     currentOptions.forEach(option => {
+          const button = document.createElement('button');
+          button.textContent = option;
+          button.onclick = () => handleAnswer(option);
+          optionsDiv.appendChild(button);
+        });
   }
 
   // 回答を処理
   function handleAnswer(isCorrect) {
-    if (isCorrect) {
+    if (isCorrect==currentQuestions[currentIndex].correct.data['名称']) {
       currentScore += 10;
       alert('正解です！');
     } else {
