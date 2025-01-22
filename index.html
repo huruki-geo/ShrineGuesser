@@ -153,7 +153,7 @@
 
   // 現在の問題を表示
   function displayQuestion() {
-    const question = currentQuestions[currentIndex];
+    const question = currentQuestions[currentIndex].correct.data;
     const questionText = document.getElementById('question-text');
 
     if (currentGameMode === 'guess-location') {
@@ -201,7 +201,7 @@
     correctOption.onclick = () => handleAnswer(true);
 
     const wrongOptions = shuffle(
-      currentQuestions
+      currentQuestions[currentIndex].wrong
         .filter(q => q['名称'] !== question['名称'])
         .slice(0, 3)
     ).map(wrong => {
