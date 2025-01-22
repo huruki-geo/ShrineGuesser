@@ -241,7 +241,7 @@
     const score = Math.max(0, 100 - Math.floor(distance / 5));
     currentScore += score;
 
-    alert(`得点: ${score}点 (距離: ${distance.toFixed(2)}px)`);
+    alert(`得点: ${score}点 (距離: ${distance.toFixed(2)}px)  所在地は${currentQuestions[currentIndex].correct.data["所在地"]}`);
 
     nextQuestion();
   }
