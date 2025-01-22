@@ -79,7 +79,7 @@
 </head>
 <body>
   <h1>神社 Guesser</h1>
-
+  <div id="loading" style="display: none;">読み込み中...</div>
   <div class="game-mode" id="game-mode-selection">
     <h2>ゲームモードを選択してください</h2>
     <button onclick="startGame('guess-location')">神社の場所を当てる</button>
@@ -89,14 +89,13 @@
   <div class="question" id="question" style="display: none;">
     <h2 id="game-title"></h2>
     <p id="question-text">ここに問題が表示されます。</p>
-    <div id="loading" style="display: none;">読み込み中...</div>
     <div id="options" style="display: none;"></div>
     <div id="map-container" style="display: none;">
       <img src="Japanmap.svg" id="japan-map" alt="日本地図" width="800" height="800">
     </div>
     <button id="submit-button" onclick="submitAnswer()" style="display: none;">決定</button>
   </div>
-
+  
   <h1>Scoreboard</h1>
   <button id="loadScores">スコアを取得する</button>
   <ul id="scoreList"></ul>
@@ -105,16 +104,18 @@
     <h2>ゲーム終了！</h2>
     <p>合計スコア: <span id="final-score"></span></p>
     <form id="score-form">
+        <div class="form-group">
       <label for="player-name">名前を入力してください:</label>
-      <input type="text" id="player-name" name="player-name" required>
+        <input type="text" id="player-name" name="player-name" class="form-control" required>
       <button type="button" onclick="submitFinalScore()">スコアを送信</button>
+        </div>
     </form>
   </div>
   <footer class="bg-dark fixed-bottom">
   <div class='container mt-5'>
   	<div class='row'>
     	<div class='mx-auto text-white'>
-    	　<p>このクイズはWikipediaのテキストを改変し利用しています。 ver0.11</p>
+    	　<p>このクイズはWikipediaのテキストを改変し利用しています。 ver0.12</p>
     	</div>
     </div>
   </div>
