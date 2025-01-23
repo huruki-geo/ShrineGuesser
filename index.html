@@ -110,12 +110,13 @@
       <button type="button" onclick="submitFinalScore()">スコアを送信</button>
         </div>
     </form>
+    <a href="" rel="nofollow" target="_blank" id="twitter">Twitterでシェア</a>
   </div>
   <footer class="bg-dark fixed-bottom">
   <div class='container mt-5'>
   	<div class='row'>
     	<div class='mx-auto text-white'>
-    	　<p>このクイズはWikipediaのテキストを改変し利用しています。 ver0.20</p>
+    	　<p>このクイズはWikipediaのテキストを改変し利用しています。 ver0.25</p>
     	</div>
     </div>
   </div>
@@ -134,7 +135,7 @@
   const LAT_MAX = 46.0;
   const LON_MIN = 123.0;
   const LON_MAX = 146.0;
-
+  const twitter=document.getElementById("twitter");
   const scoreList = document.getElementById("scoreList");
   const loadScoresButton = document.getElementById("loadScores");
   loadScoresButton.addEventListener("click", async () => {
@@ -289,6 +290,7 @@
     document.getElementById('question').style.display = 'none';
     document.getElementById('result-screen').style.display = 'block';
     document.getElementById('final-score').textContent = currentScore;
+    twitter.href=`https://x.com/intent/post?text=神社Guesserで${currentScore}を獲得しました！`
   }
 
   async function submitFinalScore() {
