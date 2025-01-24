@@ -318,7 +318,7 @@
   <div class='container mt-5'>
   	<div class='row'>
     	<div class='mx-auto text-white'>
-    	　<p>このクイズはWikipediaのテキストを改変し利用しています。 ver0.31</p>
+    	　<p>このクイズはWikipediaのテキストを改変し利用しています。 ver0.32</p>
     	</div>
     </div>
   </div>
@@ -415,9 +415,9 @@
 
       const pin = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
       pin.setAttribute('id', 'selected-pin');
-      pin.setAttribute('cx', x);
-      pin.setAttribute('cy', y);
-      pin.setAttribute('r', 5);
+      pin.setAttribute('cx', x*3.1);
+      pin.setAttribute('cy', y*3.1);
+      pin.setAttribute('r', 15);
       pin.setAttribute("z-index",9999);
       pin.setAttribute('fill', 'red');
       map.appendChild(pin);
