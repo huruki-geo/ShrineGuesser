@@ -205,7 +205,7 @@
   }
 
   function resetMap() {
-    const map = document.getElementById('japan-map');
+    const map = document.getElementById('map-container');
     map.addEventListener('click', event => {
       const rect = map.getBoundingClientRect();
       const x = event.clientX - rect.left;
