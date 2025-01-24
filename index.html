@@ -91,7 +91,9 @@
     <p id="question-text">ここに問題が表示されます。</p>
     <div id="options" style="display: none;"></div>
     <div id="map-container" style="display: none;">
+      <svg id="mapsvg">
       <img src="Japanmap.svg" id="japan-map" alt="日本地図" width="800" height="800">
+      </svg>
     </div>
     <button id="submit-button" onclick="submitAnswer()" style="display: none;">決定</button>
   </div>
@@ -205,7 +207,7 @@
   }
 
   function resetMap() {
-    const map = document.getElementById('map-container');
+    const map = document.getElementById('japan-map');
     map.addEventListener('click', event => {
       const rect = map.getBoundingClientRect();
       const x = event.clientX - rect.left;
@@ -223,7 +225,7 @@
       pin.setAttribute('r', 5);
       pin.setAttribute("z-index",9999);
       pin.setAttribute('fill', 'blue');
-      map.appendChild(pin);
+      document.getElementById('mapsvg').appendChild(pin);
     });
   }
 
